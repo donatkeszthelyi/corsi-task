@@ -159,7 +159,7 @@ def main():
     event.waitKeys(keyList=['space', 'escape'])
     nineCubesWindow.close()
     data = open('corsi_data_output.csv', 'a')
-    data.write(f'ID,{participant_id},corsi_span,{max_sequence_length - 1},\n')
+    data.write(f'{participant_id},{max_sequence_length - 1},\n')
     data.close()
     print(f"Corsi Span: {max_sequence_length - 1}")
 
