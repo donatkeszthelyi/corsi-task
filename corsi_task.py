@@ -5,6 +5,12 @@ import numpy as np
 DISPSIZE = (1920, 1080)
 
 def grid800():
+    """
+    Generates a grid of coordinates within a certain range.
+
+    Returns:
+        list: A list of dictionaries containing x and y coordinates.
+    """
     grid = []
     for i in range(10):
         for j in range(10):
@@ -14,11 +20,26 @@ def grid800():
     return grid
 
 def generateCordsForBlocks():
+    """
+    Generates random coordinates for the blocks.
+
+    Returns:
+        list: A list of randomly shuffled coordinates.
+    """
     grid = grid800()
     np.random.shuffle(grid)
     return grid[:9]
 
 def drawNineBlocks(window, cords, clicked=None, ready_for_input=False):
+    """
+    Draws nine blocks on the window.
+
+    Args:
+        window (Window): The window to draw on.
+        cords (list): List of dictionaries containing block coordinates.
+        clicked (list, optional): List of indices of clicked blocks. Defaults to None.
+        ready_for_input (bool, optional): Indicates if ready for user input. Defaults to False.
+    """
     for i, cord in enumerate(cords):
         px, py = cord['x'], cord['y']
         position = (px, py)
@@ -41,6 +62,17 @@ def drawNineBlocks(window, cords, clicked=None, ready_for_input=False):
     window.flip()
 
 def lightUp(window, cords, num_blocks):
+    """
+    Lights up a sequence of blocks randomly.
+
+    Args:
+        window (Window): The window to draw on.
+        cords (list): List of dictionaries containing block coordinates.
+        num_blocks (int): Number of blocks to light up in the sequence.
+
+    Returns:
+        list: Indices of blocks lit up in the sequence.
+    """
     sequence = np.random.choice(len(cords), min(num_blocks, len(cords)), replace=False)
     for i in sequence:
         for j, cord in enumerate(cords):
@@ -60,6 +92,17 @@ def lightUp(window, cords, num_blocks):
     return sequence
 
 def checkClicks(window, cords, sequence):
+    """
+    Checks if the user clicks on the blocks in the correct sequence.
+
+    Args:
+        window (Window): The window to draw on.
+        cords (list): List of dictionaries containing block coordinates.
+        sequence (list): Indices of blocks lit up in the sequence.
+
+    Returns:
+        bool: True if the user clicks in the correct sequence, False otherwise.
+    """
     mouse = event.Mouse(win=window)
     clicked_sequence = []
     clicked_blocks = []
@@ -82,6 +125,10 @@ def checkClicks(window, cords, sequence):
     return clicked_sequence == list(sequence)
 
 def main():
+    """
+    Main function to execute the Corsi Block-Tapping Task.
+    """
+    # Initialize window and parameters
     nineCubesWindow = Window(size=DISPSIZE, color=(-1,-1,-1), fullscr=False, units='pix')
     max_sequence_length = 1
     fail_count = 0
@@ -92,6 +139,8 @@ def main():
     participant_id_input.draw()
     cont.draw()
     nineCubesWindow.flip()
+    
+     # Participant ID input
     participant_id = ''
     while True:
         keys = event.getKeys()
@@ -110,6 +159,8 @@ def main():
             participant_id_input.draw()
             cont.draw()
             nineCubesWindow.flip()
+    
+    # Introduction
     intro1 = TextStim(nineCubesWindow, text="CORSI BLOCK-TAPPING TASK", color='white', height=70, pos=(0, 300), bold=True, wrapWidth=1200)
     intro2 = TextStim(nineCubesWindow, text="Welcome to the Corsi Block-Tapping Task! Nine white blocks will appear on the screen. Your objective is to replicate a sequence in which the blocks light up blue. A sequence will be presented, and when you see 'Go!' on the sides, it's your turn to click on the blocks in the same order. Once you click on a block, it can't be changed. If you get a sequence wrong, you'll get another chance. Your score is based on the longest sequence you reproduce correctly. Good luck!", color='white', height=40, pos=(0, 0), wrapWidth=1200)
     intro3 = TextStim(nineCubesWindow, text="Press 'Space' to begin!", color='yellow', height=30, pos=(0, -270))
@@ -117,7 +168,11 @@ def main():
     intro2.draw()
     intro3.draw()
     nineCubesWindow.flip()
+
+     # Wait for space or escape key press
     event.waitKeys(keyList=['space', 'escape'])
+
+    # Task loop
     while True:
         if event.getKeys(['escape']):
             core.quit()
@@ -151,6 +206,8 @@ def main():
         if event.getKeys(['escape']):
             core.quit()
             break
+    
+    # End of task
     endText1 = TextStim(nineCubesWindow, text=f"Corsi Span: {max_sequence_length - 1}", color='white', height=80, pos=(0, 70))
     endText2 = TextStim(nineCubesWindow, text="Press 'Space' to quit!", color='yellow', height=30, pos=(0, -20))
     endText1.draw()
@@ -158,10 +215,15 @@ def main():
     nineCubesWindow.flip()
     event.waitKeys(keyList=['space', 'escape'])
     nineCubesWindow.close()
+
+    # Writing data to file
     data = open('corsi_data_output.csv', 'a')
     data.write(f'{participant_id},{max_sequence_length - 1},\n')
     data.close()
+
+    # Print result to terminal
     print(f"Corsi Span: {max_sequence_length - 1}")
 
+# Executing the main function if the code is run directly
 if __name__ == "__main__":
     main()
